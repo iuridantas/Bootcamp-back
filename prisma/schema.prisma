@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String      @id @unique @default(uuid())
+  name       String
+  email      String      @unique
+  cpf        String
+  password   String
+  user_type  String
+  created_at DateTime
+  closed_at  DateTime?
+  franchises Franchise[]
+  franchiseId  String?
+}
+
+model Franchise {
+  id                String     @id @unique @default(uuid())
+  name              String
+  cnpj              String     
+  plan              String
+  address           String
+  city              String
+  state             String
+  score             Int
+  description       String
+  zip_code          String
+  field_of_activity String
+  created_at        DateTime
+  closed_at         DateTime?
+  calls             Call[]     
+  customers         Customer[] 
+  products          Product[]  
+  finances          Finance[]  
+  user              User       @relation(fields: [userId], references: [id])
+  userId            String
+}
+
+model Call {
+  id          String    @id @unique @default(uuid())
+  description String
+  status      String
+  created_at  DateTime
+  closed_at   DateTime?
+  franchise   Franchise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  franchiseId String
+}
+
+model Customer {
+  id          String    @id @unique @default(uuid())
+  name        String
+  created_at  DateTime
+  closed_at   DateTime?
+  franchise   Franchise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  franchiseId String
+}
+
+model Finance {
+  id              String    @id @unique @default(uuid())
+  tier            String
+  score_performed Int
+  MRR             Float
+  MDR             Float
+  commission      Float
+  created_at      DateTime
+  closed_at       DateTime?
+  franchise       Franchise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  franchiseId     String
+}
+
+model Product {
+  id          String    @id @unique @default(uuid())
+  name        String
+  description String
+  price       Float
+  created_at  DateTime
+  closed_at   DateTime?
+  franchise   Franchise @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  franchiseId String
+}
